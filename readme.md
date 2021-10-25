@@ -1,3 +1,7 @@
+This is my fork of Gameboy Cart Flasher. i aim to work on making the sourcecode work better on linux. i am very much a beginner at this but i am learning a lot on the way there :-)
+
+
+
 Gameboy Cart Flasher Software
 ====================================
 
