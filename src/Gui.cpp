@@ -18,11 +18,11 @@
 #include "QDebug"
 #include "QDateTime"
 #include "QDesktopServices"
+#include "USBPortWin.h"
+
+#ifdef _WIN32
 #include "windows.h"
 #include <QWinTaskbarProgress>
-
-#ifdef Q_OS_WIN
-#include "USBPortWin.h"
 #endif
 
 #include "const.h"
@@ -66,8 +66,10 @@ Gui::Gui (QWidget * parent):QWidget (parent)
   console = new Console (this);
   right->addWidget (console);
   progress = new QProgressBar (this);
+  #ifdef 	_WIN32
   winTaskbar = new QWinTaskbarButton(this);
   QWinTaskbarProgress *winProgress = winTaskbar->progress();
+  #endif
   down->addWidget (progress);
   cancel_btn = new QPushButton (tr ("Cancel"), this);
   cancel_btn->setEnabled (false);
@@ -103,16 +105,18 @@ Gui::Gui (QWidget * parent):QWidget (parent)
   left->addWidget (keepfiles_check);
   grid->addLayout (center, 0, 1);
   keepfiles_check->setCheckState (Qt::Checked);
+  #ifdef 	_WIN32
   winProgress->setVisible(true);
-
+  #endif
   thread_WFLA = new WriteFlashThread;
   thread_RFLA = new ReadFlashThread;
   thread_E = new EraseThread;
   thread_RRAM = new ReadRamThread;
   thread_WRAM = new WriteRamThread;
+  #ifdef 	_WIN32
   int func_wr = rand() % 100 + 1;
   if (func_wr == 23){winTaskbar->setWindow(this->windowHandle());winTaskbar->progress()->setVisible(true);winTaskbar->setOverlayIcon(QIcon(":/qss_icons/rc/genericarrow.png"));}
-
+  #endif
 
   connect (cancel_btn, SIGNAL (clicked ()), thread_RFLA, SLOT (canceled ()));
   connect (cancel_btn, SIGNAL (clicked ()), thread_WFLA, SLOT (canceled ()));
@@ -524,11 +528,13 @@ Gui::setProgress (int ile, int max)
   progress->setMinimum (0);
   progress->setMaximum (max);
   progress->setValue (ile);
+  #ifdef	_WIN32
   winTaskbar->setWindow(this->windowHandle());
   winTaskbar->progress()->setVisible(true);
   winTaskbar->progress()->setMinimum (0);
   winTaskbar->progress()->setMaximum (max);
   winTaskbar->progress()->setValue (ile);
+  #endif
 }
 
 

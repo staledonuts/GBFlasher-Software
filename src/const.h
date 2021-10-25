@@ -16,17 +16,21 @@ enum cchars
 #define USB 0
 
 /* strings for version information */
-#ifdef Q_OS_WIN
+#ifdef _WIN32
 #define SYSTEM "WINDOWS"
 #define DEVELOPED "GCC 8.2.0 + QT 5.13.1"
 #endif
 
 /* return values and errors */
-enum error_t
-{ TIMEOUT = -1, FILEERROR_O = -2, FILEERROR_W = -3, FILEERROR_R =
-    -4, SEND_ERROR = -5,
-  BAD_PACKET = -6, BAD_PARAMS = -7, PORT_ERROR = -8, WRONG_SIZE = -9
-};
+#define TIMEOUT -1
+#define FILEERROR_O -2
+#define FILEERROR_W -3
+#define FILEERROR_R -4
+#define SEND_ERROR -5
+#define BAD_PACKET -6
+#define BAD_PARAMS -7
+#define PORT_ERROR -8
+#define WRONG_SIZE -9
 
 /* packet types */
 #define CONFIG 0x00

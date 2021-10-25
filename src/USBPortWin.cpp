@@ -9,7 +9,10 @@ extern "C"{
 /*
  * Headers for hardware support under Windows
  */
+#ifdef _WIN32
 #include <windows.h>
+#endif
+
 }
 
 USBPortWin::USBPortWin()

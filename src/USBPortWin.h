@@ -1,6 +1,11 @@
 #ifndef FL_USBPORTWIN_H_
 #define FL_USBPORTWIN_H_
+#ifdef _WIN32
+// Compiling on Windows
 #include <windows.h>
+#else
+#define WINAPI
+#endif
 #include "AbstractPort.h"
 #include "ftd2xx.h"
 #include <QtSerialPort/QSerialPort>
