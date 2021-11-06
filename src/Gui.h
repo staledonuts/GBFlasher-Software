@@ -6,14 +6,13 @@
 #include <QString>
 #include <QNetworkAccessManager>
 #include <QProcess>
+#ifdef Q_OS_WIN
+#include <QWinTaskbarProgress>
+#endif
 #include "Settings.h"
 #include "Console.h"
 #include "Logic.h"
 #include "About.h"
-
-#ifdef _WIN32
-#include <QWinTaskbarProgress>
-#endif
 
 #include "ReadFlashThread.h"
 #include "WriteFlashThread.h"
@@ -31,7 +30,7 @@ class Gui:public QWidget
   QVBoxLayout *center;
   QHBoxLayout *down;
   QProgressBar *progress;
-  #ifdef _WIN32
+  #ifdef Q_OS_WIN
   QWinTaskbarButton *winTaskbar;
   #endif
   QLabel *image;

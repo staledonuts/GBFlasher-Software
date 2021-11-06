@@ -41,7 +41,7 @@ kernel & user mode
 #ifndef FTD2XX_H
 #define FTD2XX_H
 
-#ifdef 	_WIN32
+#ifdef 	Windows
 // Compiling on Windows
 #include <windows.h>
 
@@ -66,13 +66,13 @@ kernel & user mode
 #define FTD2XX_API __declspec(dllimport)
 #endif
 
-#else // _WIN32
+#else // Windows
 // Compiling on non-Windows platform.
 #include "WinTypes.h"
 // No decorations needed.
 #define FTD2XX_API
 
-#endif // _WIN32
+#endif // Windows
 
 typedef PVOID	FT_HANDLE;
 typedef ULONG	FT_STATUS;
@@ -1026,7 +1026,7 @@ extern "C" {
         ULONG ulDeadmanTimeout
         );
 
-#ifndef _WIN32
+#ifndef Windows
     // Extra functions for non-Windows platforms to compensate
     // for lack of .INF file to specify Vendor and Product IDs.
 
@@ -1047,7 +1047,7 @@ extern "C" {
         FT_HANDLE ftHandle,
         LPDWORD lpdwLocId
         );
-#endif // _WIN32
+#endif // Windows
 
     FTD2XX_API
         FT_STATUS WINAPI FT_GetDeviceInfo(

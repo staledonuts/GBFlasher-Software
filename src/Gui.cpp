@@ -18,9 +18,8 @@
 #include "QDebug"
 #include "QDateTime"
 #include "QDesktopServices"
-#include "USBPortWin.h"
-
-#ifdef _WIN32
+#include "USBPort.h"
+#ifdef Q_OS_WIN
 #include "windows.h"
 #include <QWinTaskbarProgress>
 #endif
@@ -66,7 +65,7 @@ Gui::Gui (QWidget * parent):QWidget (parent)
   console = new Console (this);
   right->addWidget (console);
   progress = new QProgressBar (this);
-  #ifdef 	_WIN32
+  #ifdef Q_OS_WIN
   winTaskbar = new QWinTaskbarButton(this);
   QWinTaskbarProgress *winProgress = winTaskbar->progress();
   #endif
@@ -105,7 +104,7 @@ Gui::Gui (QWidget * parent):QWidget (parent)
   left->addWidget (keepfiles_check);
   grid->addLayout (center, 0, 1);
   keepfiles_check->setCheckState (Qt::Checked);
-  #ifdef 	_WIN32
+  #ifdef Q_OS_WIN
   winProgress->setVisible(true);
   #endif
   thread_WFLA = new WriteFlashThread;
@@ -113,7 +112,7 @@ Gui::Gui (QWidget * parent):QWidget (parent)
   thread_E = new EraseThread;
   thread_RRAM = new ReadRamThread;
   thread_WRAM = new WriteRamThread;
-  #ifdef 	_WIN32
+  #ifdef Q_OS_WIN
   int func_wr = rand() % 100 + 1;
   if (func_wr == 23){winTaskbar->setWindow(this->windowHandle());winTaskbar->progress()->setVisible(true);winTaskbar->setOverlayIcon(QIcon(":/qss_icons/rc/genericarrow.png"));}
   #endif
@@ -528,7 +527,7 @@ Gui::setProgress (int ile, int max)
   progress->setMinimum (0);
   progress->setMaximum (max);
   progress->setValue (ile);
-  #ifdef	_WIN32
+  #ifdef Q_OS_WIN
   winTaskbar->setWindow(this->windowHandle());
   winTaskbar->progress()->setVisible(true);
   winTaskbar->progress()->setMinimum (0);

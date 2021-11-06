@@ -15,7 +15,7 @@ CXX           = g++
 DEFINES       = -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_SERIALPORT_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I. -I. -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtNetwork -isystem /usr/include/x86_64-linux-gnu/qt5/QtSerialPort -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -I. -isystem /usr/include/libdrm -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
+INCPATH       = -I. -I. -Isrc -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtNetwork -isystem /usr/include/x86_64-linux-gnu/qt5/QtSerialPort -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -I. -isystem /usr/include/libdrm -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
 QMAKE         = /usr/lib/qt5/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -35,10 +35,10 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = gbcflsh1.0.0
-DISTDIR = /home/cuddy/Projekt/Other\ Stuff/GBFlasher-Software/.tmp/gbcflsh1.0.0
+DISTDIR = /home/cuddy/Projekt/Other\ Stuff/GBFlasher-HDR/.tmp/gbcflsh1.0.0
 LINK          = g++
-LFLAGS        = -static -Wl,-O1
-LIBS          = $(SUBLIBS) -Lsrc/lib -L/home/cuddy/Projekt/Other\ Stuff/GBFlasher-Software/src/lib -lftd2xx -lQt5Widgets -lQt5Gui -lQt5Network -lQt5SerialPort -lQt5Core -lGL -lpthread 
+LFLAGS        = -Wl,-O1
+LIBS          = $(SUBLIBS) -lftd2xx -lQt5Widgets -lQt5Gui -lQt5Network -lQt5SerialPort -lQt5Core -lGL -lpthread 
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -60,10 +60,9 @@ SOURCES       = src/About.cpp \
 		src/Settings.cpp \
 		src/WriteFlashThread.cpp \
 		src/WriteRamThread.cpp \
-		src/USBPortWin.cpp qrc_style.cpp \
+		src/USBPort.cpp qrc_style.cpp \
 		moc_About.cpp \
 		moc_AbstractPort.cpp \
-		moc_USBPortWin.cpp \
 		moc_EraseThread.cpp \
 		moc_Gui.cpp \
 		moc_Logic.cpp \
@@ -71,7 +70,8 @@ SOURCES       = src/About.cpp \
 		moc_ReadRamThread.cpp \
 		moc_Settings.cpp \
 		moc_WriteFlashThread.cpp \
-		moc_WriteRamThread.cpp
+		moc_WriteRamThread.cpp \
+		moc_USBPort.cpp
 OBJECTS       = About.o \
 		EraseThread.o \
 		gbcflsh.o \
@@ -82,11 +82,10 @@ OBJECTS       = About.o \
 		Settings.o \
 		WriteFlashThread.o \
 		WriteRamThread.o \
-		USBPortWin.o \
+		USBPort.o \
 		qrc_style.o \
 		moc_About.o \
 		moc_AbstractPort.o \
-		moc_USBPortWin.o \
 		moc_EraseThread.o \
 		moc_Gui.o \
 		moc_Logic.o \
@@ -94,7 +93,8 @@ OBJECTS       = About.o \
 		moc_ReadRamThread.o \
 		moc_Settings.o \
 		moc_WriteFlashThread.o \
-		moc_WriteRamThread.o
+		moc_WriteRamThread.o \
+		moc_USBPort.o
 DIST          = src/lib/ftd2xx.lib \
 		src/icon.xpm \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
@@ -177,20 +177,21 @@ DIST          = src/lib/ftd2xx.lib \
 		gbcf.pro src/About.h \
 		src/AbstractPort.h \
 		src/Console.h \
-		src/USBPortWin.h \
 		src/const.h \
 		src/EraseThread.h \
+		src/ftd2xx.h \
 		src/Gui.h \
 		src/Logic.h \
 		src/ReadFlashThread.h \
 		src/ReadRamThread.h \
 		src/Settings.h \
+		src/WinTypes.h \
 		src/WriteFlashThread.h \
 		src/WriteRamThread.h \
-		src/WinTypes.h \
 		src/about.xpm \
-		src/ftd2xx.h \
-		src/icon.xpm src/About.cpp \
+		src/flasher.xpm \
+		src/icon.xpm \
+		src/USBPort.h src/About.cpp \
 		src/EraseThread.cpp \
 		src/gbcflsh.cpp \
 		src/Gui.cpp \
@@ -200,7 +201,7 @@ DIST          = src/lib/ftd2xx.lib \
 		src/Settings.cpp \
 		src/WriteFlashThread.cpp \
 		src/WriteRamThread.cpp \
-		src/USBPortWin.cpp
+		src/USBPort.cpp
 QMAKE_TARGET  = gbcflsh
 DESTDIR       = 
 TARGET        = gbcflsh
@@ -397,8 +398,9 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents qdarkstyle/style.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents src/About.h src/AbstractPort.h src/Console.h src/USBPortWin.h src/const.h src/EraseThread.h src/Gui.h src/Logic.h src/ReadFlashThread.h src/ReadRamThread.h src/Settings.h src/WriteFlashThread.h src/WriteRamThread.h src/WinTypes.h src/about.xpm src/ftd2xx.h src/icon.xpm $(DISTDIR)/
-	$(COPY_FILE) --parents src/About.cpp src/EraseThread.cpp src/gbcflsh.cpp src/Gui.cpp src/Logic.cpp src/ReadFlashThread.cpp src/ReadRamThread.cpp src/Settings.cpp src/WriteFlashThread.cpp src/WriteRamThread.cpp src/USBPortWin.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents src/About.h src/AbstractPort.h src/Console.h src/const.h src/EraseThread.h src/ftd2xx.h src/Gui.h src/Logic.h src/ReadFlashThread.h src/ReadRamThread.h src/Settings.h src/WinTypes.h src/WriteFlashThread.h src/WriteRamThread.h src/about.xpm src/flasher.xpm src/icon.xpm src/USBPort.h $(DISTDIR)/
+	$(COPY_FILE) --parents src/About.cpp src/EraseThread.cpp src/gbcflsh.cpp src/Gui.cpp src/Logic.cpp src/ReadFlashThread.cpp src/ReadRamThread.cpp src/Settings.cpp src/WriteFlashThread.cpp src/WriteRamThread.cpp src/USBPort.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents src/gbcflsh_english.ts src/gbcflsh_french.ts src/gbcflsh_german.ts src/gbcflsh_polish.ts $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -645,26 +647,18 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 	g++ -pipe -O2 -Wall -W -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_About.cpp moc_AbstractPort.cpp moc_USBPortWin.cpp moc_EraseThread.cpp moc_Gui.cpp moc_Logic.cpp moc_ReadFlashThread.cpp moc_ReadRamThread.cpp moc_Settings.cpp moc_WriteFlashThread.cpp moc_WriteRamThread.cpp
+compiler_moc_header_make_all: moc_About.cpp moc_AbstractPort.cpp moc_EraseThread.cpp moc_Gui.cpp moc_Logic.cpp moc_ReadFlashThread.cpp moc_ReadRamThread.cpp moc_Settings.cpp moc_WriteFlashThread.cpp moc_WriteRamThread.cpp moc_USBPort.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_About.cpp moc_AbstractPort.cpp moc_USBPortWin.cpp moc_EraseThread.cpp moc_Gui.cpp moc_Logic.cpp moc_ReadFlashThread.cpp moc_ReadRamThread.cpp moc_Settings.cpp moc_WriteFlashThread.cpp moc_WriteRamThread.cpp
+	-$(DEL_FILE) moc_About.cpp moc_AbstractPort.cpp moc_EraseThread.cpp moc_Gui.cpp moc_Logic.cpp moc_ReadFlashThread.cpp moc_ReadRamThread.cpp moc_Settings.cpp moc_WriteFlashThread.cpp moc_WriteRamThread.cpp moc_USBPort.cpp
 moc_About.cpp: src/About.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-Software/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/About.h -o moc_About.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/src' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/About.h -o moc_About.cpp
 
 moc_AbstractPort.cpp: src/AbstractPort.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-Software/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/AbstractPort.h -o moc_AbstractPort.cpp
-
-moc_USBPortWin.cpp: src/AbstractPort.h \
-		src/ftd2xx.h \
-		src/WinTypes.h \
-		src/USBPortWin.h \
-		moc_predefs.h \
-		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-Software/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/USBPortWin.h -o moc_USBPortWin.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/src' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/AbstractPort.h -o moc_AbstractPort.cpp
 
 moc_EraseThread.cpp: src/AbstractPort.h \
 		src/Logic.h \
@@ -672,7 +666,7 @@ moc_EraseThread.cpp: src/AbstractPort.h \
 		src/EraseThread.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-Software/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/EraseThread.h -o moc_EraseThread.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/src' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/EraseThread.h -o moc_EraseThread.cpp
 
 moc_Gui.cpp: src/Settings.h \
 		src/const.h \
@@ -688,14 +682,14 @@ moc_Gui.cpp: src/Settings.h \
 		src/Gui.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-Software/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/Gui.h -o moc_Gui.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/src' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/Gui.h -o moc_Gui.cpp
 
 moc_Logic.cpp: src/const.h \
 		src/AbstractPort.h \
 		src/Logic.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-Software/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/Logic.h -o moc_Logic.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/src' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/Logic.h -o moc_Logic.cpp
 
 moc_ReadFlashThread.cpp: src/AbstractPort.h \
 		src/Logic.h \
@@ -703,7 +697,7 @@ moc_ReadFlashThread.cpp: src/AbstractPort.h \
 		src/ReadFlashThread.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-Software/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/ReadFlashThread.h -o moc_ReadFlashThread.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/src' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/ReadFlashThread.h -o moc_ReadFlashThread.cpp
 
 moc_ReadRamThread.cpp: src/AbstractPort.h \
 		src/Logic.h \
@@ -711,13 +705,13 @@ moc_ReadRamThread.cpp: src/AbstractPort.h \
 		src/ReadRamThread.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-Software/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/ReadRamThread.h -o moc_ReadRamThread.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/src' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/ReadRamThread.h -o moc_ReadRamThread.cpp
 
 moc_Settings.cpp: src/const.h \
 		src/Settings.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-Software/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/Settings.h -o moc_Settings.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/src' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/Settings.h -o moc_Settings.cpp
 
 moc_WriteFlashThread.cpp: src/AbstractPort.h \
 		src/Logic.h \
@@ -725,7 +719,7 @@ moc_WriteFlashThread.cpp: src/AbstractPort.h \
 		src/WriteFlashThread.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-Software/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/WriteFlashThread.h -o moc_WriteFlashThread.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/src' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/WriteFlashThread.h -o moc_WriteFlashThread.cpp
 
 moc_WriteRamThread.cpp: src/AbstractPort.h \
 		src/Logic.h \
@@ -733,7 +727,15 @@ moc_WriteRamThread.cpp: src/AbstractPort.h \
 		src/WriteRamThread.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
-	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-Software/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-Software' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/WriteRamThread.h -o moc_WriteRamThread.cpp
+	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/src' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/WriteRamThread.h -o moc_WriteRamThread.cpp
+
+moc_USBPort.cpp: src/AbstractPort.h \
+		src/ftd2xx.h \
+		src/WinTypes.h \
+		src/USBPort.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include '/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/moc_predefs.h' -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR' -I'/home/cuddy/Projekt/Other Stuff/GBFlasher-HDR/src' -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtSerialPort -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/8 -I/usr/include/x86_64-linux-gnu/c++/8 -I/usr/include/c++/8/backward -I/usr/lib/gcc/x86_64-linux-gnu/8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include src/USBPort.h -o moc_USBPort.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -789,7 +791,7 @@ Gui.o: src/Gui.cpp src/Gui.h \
 		src/EraseThread.h \
 		src/ReadRamThread.h \
 		src/WriteRamThread.h \
-		src/USBPortWin.h \
+		src/USBPort.h \
 		src/ftd2xx.h \
 		src/WinTypes.h \
 		src/icon.xpm
@@ -842,13 +844,13 @@ WriteRamThread.o: src/WriteRamThread.cpp src/WriteRamThread.h \
 		src/Settings.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o WriteRamThread.o src/WriteRamThread.cpp
 
-USBPortWin.o: src/USBPortWin.cpp src/const.h \
-		src/USBPortWin.h \
+USBPort.o: src/USBPort.cpp src/const.h \
+		src/USBPort.h \
 		src/AbstractPort.h \
 		src/ftd2xx.h \
 		src/WinTypes.h \
 		src/Settings.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o USBPortWin.o src/USBPortWin.cpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o USBPort.o src/USBPort.cpp
 
 qrc_style.o: qrc_style.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_style.o qrc_style.cpp
@@ -858,9 +860,6 @@ moc_About.o: moc_About.cpp
 
 moc_AbstractPort.o: moc_AbstractPort.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_AbstractPort.o moc_AbstractPort.cpp
-
-moc_USBPortWin.o: moc_USBPortWin.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_USBPortWin.o moc_USBPortWin.cpp
 
 moc_EraseThread.o: moc_EraseThread.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_EraseThread.o moc_EraseThread.cpp
@@ -886,18 +885,27 @@ moc_WriteFlashThread.o: moc_WriteFlashThread.cpp
 moc_WriteRamThread.o: moc_WriteRamThread.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_WriteRamThread.o moc_WriteRamThread.cpp
 
+moc_USBPort.o: moc_USBPort.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_USBPort.o moc_USBPort.cpp
+
 ####### Install
+
+install_langpack: first FORCE
+	@test -d $(INSTALL_ROOT)/usr/share/gbcf || mkdir -p $(INSTALL_ROOT)/usr/share/gbcf
+	lrelease gbcf.pro
+
 
 install_exec: first FORCE
 	@test -d $(INSTALL_ROOT)/usr/bin || mkdir -p $(INSTALL_ROOT)/usr/bin
-	-$(QINSTALL_PROGRAM) /home/cuddy/Projekt/Other\ Stuff/GBFlasher-Software/gbcflsh $(INSTALL_ROOT)/usr/bin/gbcflsh
+	-$(QINSTALL_PROGRAM) /home/cuddy/Projekt/Other\ Stuff/GBFlasher-HDR/gbcflsh $(INSTALL_ROOT)/usr/bin/gbcflsh
+	-strip $(INSTALL_ROOT)/usr/bin/gbcflsh
 
 uninstall_exec: FORCE
 	-$(DEL_FILE) -r $(INSTALL_ROOT)/usr/bin/gbcflsh
 	-$(DEL_DIR) $(INSTALL_ROOT)/usr/bin/ 
 
 
-install: install_exec  FORCE
+install: install_langpack install_exec  FORCE
 
 uninstall: uninstall_exec  FORCE
 

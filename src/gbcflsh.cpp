@@ -88,7 +88,7 @@ main (int argc, char *argv[])
 
   Gui window;
   window.show ();
-#ifdef _WIN32
+#ifdef Q_OS_WIN
   window.startup_info();
 #endif
   return app.exec ();

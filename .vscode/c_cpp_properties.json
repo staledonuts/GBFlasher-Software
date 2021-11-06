@@ -3,16 +3,21 @@
         {
             "name": "Linux",
             "includePath": [
-                "${default}",
-                "/usr/include/x86_64-linux-gnu/qt5",
-                "/usr/include/x86_64-linux-gnu/qt5/QtGui",
-                "/usr/include/x86_64-linux-gnu/qt5/QtCore",
-                "/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
-                "/usr/include/x86_64-linux-gnu/qt5/QtNetwork",
-                "/usr/include/x86_64-linux-gnu/qt5/QtSerialBus/",
-                "/usr/include/x86_64-linux-gnu/qt5/QtSerialPort/",
-                "/home/cuddy/Hämtningar/GBFlasher-Software-master/src/"
+                "${workspaceFolder}/**",
+                "/usr/include/x86_64-linux-gnu/qt5/**"
             ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu17",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "linux-gcc-x64"
+        },
+        {
+            "name": "LinuxFlsh",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "gnu17",
             "cppStandard": "gnu++14",

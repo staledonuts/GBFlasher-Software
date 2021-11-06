@@ -16,7 +16,7 @@ enum cchars
 #define USB 0
 
 /* strings for version information */
-#ifdef _WIN32
+#ifdef Q_OS_WIN
 #define SYSTEM "WINDOWS"
 #define DEVELOPED "GCC 8.2.0 + QT 5.13.1"
 #endif

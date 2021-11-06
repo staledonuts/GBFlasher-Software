@@ -1,8 +1,6 @@
 #include "const.h"
-#include "USBPortWin.h"
+#include "USBPort.h"
 #include "Settings.h"
-#include <ftd2xx.h>
-#include <iostream>
 
 extern "C"{
 #include <time.h>
@@ -14,6 +12,7 @@ extern "C"{
 #ifdef Windows
 #include <windows.h>
 #endif
+
 }
 
 USBPortWin::USBPortWin()
