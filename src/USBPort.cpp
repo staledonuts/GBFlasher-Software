@@ -9,9 +9,6 @@ extern "C"{
 /*
  * Headers for hardware support under Windows
  */
-#ifdef Windows
-#include <windows.h>
-#endif
 
 }
 

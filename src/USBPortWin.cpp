@@ -1,6 +1,7 @@
 #include "const.h"
 #include "USBPortWin.h"
 #include "Settings.h"
+#include <windows.h>
 #include <ftd2xx.h>
 #include <iostream>
 
@@ -11,9 +12,6 @@ extern "C"{
 /*
  * Headers for hardware support under Windows
  */
-#ifdef Windows
-#include <windows.h>
-#endif
 }
 
 USBPortWin::USBPortWin()

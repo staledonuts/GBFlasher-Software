@@ -2,7 +2,8 @@
     "files.associations": {
         "qmessagebox": "cpp",
         "qnetworkaccessmanager": "cpp",
-        "qserialport": "cpp"
+        "qserialport": "cpp",
+        "qstring": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }
